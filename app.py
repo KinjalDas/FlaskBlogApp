@@ -81,13 +81,16 @@ def login():
     else:
         return generateErrTemplate("Bad Request!")
 
-@app.route('/logout',methods=['POST'])
+@app.route('/logout',methods=['GET','POST'])
 def logout():
     if request.method == "POST":
         type = request.form["type"]
         if type == "logout":
             session.clear()
             return index()
+    elif request.method == "GET":
+        session.clear()
+        return index()
     else:
         return generateErrTemplate("Bad Request!")
 
