@@ -36,13 +36,45 @@
         </div>
       </li>
     </ul>
-
+    {% if not LoggedIn %}
     <form class="form-inline my-2 my-lg-0">
     <button type="button" class="btn btn-primary mr-sm-2" data-toggle="modal" data-target="#register">REGISTER</button>
     <button type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#login_modal">LOGIN</button>
     </form>
+    {% else %}
+    <form class="form-inline my-2 my-lg-0" action="/account">
+    <input type="submit" class="btn btn-primary mr-sm-2" value={{ LoggedIn }}>
+    <button type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#logout_modal">LOGOUT</button>
+    </form>
+    {% endif %}
   </nav>
 
+
+  <!--LOGOUT-->
+      <div class="modal fade" id="logout_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Logout</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="container">
+            <form action="/logout" id ="logout_form" method="post">
+              <input type="hidden" id="type" name="type" value="logout">
+              Are You Sure You Want To LOGOUT ?
+            </form>
+          </div>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" form="logout_form" class="btn btn-primary">YES !</button>
+        </div>
+    </div>
+    </div>
+    </div>
 
 <!--LOGIN-->
     <div class="modal fade" id="login_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -114,7 +146,6 @@
 </div>
 </div>
 </div>
-
   {% block body %}
   {% endblock %}
   </body>

@@ -15,17 +15,21 @@ def generateErrTemplate(err):
     print(err)
     return render_template('error.html',err=err)
 
-def UserName_or_Email_Exists(username=None,email=None):
-    if ((username != None) and (users.count_documents({"UserName" : username}) == 0)):
+def UserName_Exists(username):
+    if users.count_documents({"UserName" : username}) == 0:
         return False
-    elif ((email != None) and (users.find({"Email" : email}).count()) == 0):
+    else:
+        return True
+
+def Email_Exists(email):
+    if users.count_documents({"Email" : email}) == 0:
         return False
     else:
         return True
 
 def loggingin(username,password):
     print(username,password)
-    if UserName_or_Email_Exists(username=username,email=None):
+    if UserName_Exists(username):
         user = users.find_one({"UserName" : username})
         pw = user["Password"]
         if password == pw:
@@ -42,12 +46,13 @@ def check_logged_in():
     else:
         return False
 
-@app.route('/',methods=['GET'])
+@app.route('/',methods=['GET','POST'])
 def index():
-    if request.method == "GET":
-        return render_template('index.html',db=db)
+    LoggedIn = check_logged_in()
+    if (request.method == "GET") or (request.method == "POST"):
+        return render_template('index.html',db=db,LoggedIn=LoggedIn)
     else:
-        return redirect(url_for('generateErrTemplate' ,err="Bad Request!"))
+        return generateErrTemplate("Bad Request!")
 
 @app.route('/register',methods=['POST'])
 def register():
@@ -57,8 +62,8 @@ def register():
             email = request.form["RegisterEmail"]
             username = request.form["RegisterUserName"]
             password = request.form["RegisterPassword"]
-            if UserName_or_Email_Exists(username,email):
-                return redirect(url_for('generateErrTemplate' ,err="UserName/Email Already Exists!"))
+            if UserName_Exists(username) or Email_Exists(email):
+                return generateErrTemplate("UserName/Email Already Exists!")
             userAcc = {"UserName":username, "Email":email, "Password":password}
             users.insert_one(userAcc)
             return loggingin(username,password)
@@ -73,6 +78,16 @@ def login():
             username = request.form["LoginUserName"]
             password = request.form["LoginPassword"]
             return loggingin(username,password)
+    else:
+        return generateErrTemplate("Bad Request!")
+
+@app.route('/logout',methods=['POST'])
+def logout():
+    if request.method == "POST":
+        type = request.form["type"]
+        if type == "logout":
+            session.clear()
+            return index()
     else:
         return generateErrTemplate("Bad Request!")
 
